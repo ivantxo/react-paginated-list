@@ -89,6 +89,23 @@ class App extends React.Component {
 
 // React ES6 class component
 class List extends React.Component {
+  componentDidMount() {
+    window.addEventListener('scroll', this.onScroll, false);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.onScroll, false);
+  }
+
+  onScroll = () => {
+    if (
+      (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500) &&
+      this.props.list.length
+    ) {
+      this.props.onPaginatedSearch();
+    }
+  }
+
   render() {
     const { list } = this.props;
     return (

@@ -84,23 +84,7 @@ const List = ({ list, page, isLoading, onPaginatedSearch }) =>
         <a href={item.url}>* {item.title}</a>
       </div>)}
     </div>
-
-    <div>
-      {isLoading && <span>Loading...</span>}
-    </div>
-
-    {/* <div className="interactions">
-      {
-        (page !== null && !isLoading) &&
-        <button
-          type="button"
-          onClick={onPaginatedSearch}
-        >
-          More
-        </button>
-      }
-    </div> */}
-  </div>
+  </div>;
 
 const DifferentList = ({ list }) =>
   <div className="list">
@@ -149,6 +133,6 @@ const withPaginated = (Component) => (props) =>
 const ListWithLoadingWithPaginated = compose(
   withPaginated,
   withLoading,
-)(DifferentList);
+)(List);
 
 export default App;

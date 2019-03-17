@@ -59,6 +59,8 @@ class App extends React.Component {
   render() {
     return (
       <div className="page">
+        <h1>Search Hacker News</h1>
+
         <div className="interactions">
           <form type="submit" onSubmit={this.onInitialSearch}>
             <input type="text" ref={node => this.input = node} />
@@ -66,9 +68,8 @@ class App extends React.Component {
           </form>
         </div>
 
-        <ListWithLoadingWithPaginated
+        <ListWithLoadingWithInfinite
           list={this.state.hits}
-          isLoading={this.state.isLoading}
           page={this.state.page}
           onPaginatedSearch={this.onPaginatedSearch}
         />
@@ -78,47 +79,69 @@ class App extends React.Component {
 }
 
 // Functional stateless component
-// const List = ({ list, page, isLoading, onPaginatedSearch }) =>
-//   <div>
-//     <div className="list">
-//       {list.map(item => <div className="list-row" key={item.objectID}>
-//         <a href={item.url}>* {item.title}</a>
-//       </div>)}
-//     </div>
-//   </div>;
+const List = ({ list }) =>
+  <div className="list">
+    {list.map(item => <div className="list-row" key={item.objectID}>
+      <a href={item.url}>* {item.title}</a>
+    </div>)}
+  </div>;
 
 // React ES6 class component
-class List extends React.Component {
-  componentDidMount() {
-    window.addEventListener('scroll', this.onScroll, false);
-  }
+// class List extends React.Component {
+//   componentDidMount() {
+//     window.addEventListener('scroll', this.onScroll, false);
+//   }
 
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.onScroll, false);
-  }
+//   componentWillUnmount() {
+//     window.removeEventListener('scroll', this.onScroll, false);
+//   }
 
-  onScroll = () => {
-    if (
-      (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500) &&
-      this.props.list.length
-    ) {
-      this.props.onPaginatedSearch();
+//   onScroll = () => {
+//     if (
+//       (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500) &&
+//       this.props.list.length
+//     ) {
+//       this.props.onPaginatedSearch();
+//     }
+//   }
+
+//   render() {
+//     const { list } = this.props;
+//     return (
+//       <div className="list">
+//         {
+//           list.map(item => <div className="list-row" key={item.objectID}>
+//             <a href={item.url}>{item.title}</a>
+//           </div>)
+//         }
+//       </div>
+//     );
+//   }
+// }
+
+const withInfiniteScroll = (Component) =>
+  class WithInfiniteScroll extends React.Component {
+    componentDidMount() {
+      window.addEventListener('scroll', this.onScroll, false);
     }
-  }
 
-  render() {
-    const { list } = this.props;
-    return (
-      <div className="list">
-        {
-          list.map(item => <div className="list-row" key={item.objectID}>
-            <a href={item.url}>{item.title}</a>
-          </div>)
-        }
-      </div>
-    );
-  }
-}
+    componentWillUnmount() {
+      window.removeEventListener('scroll', this.onScroll, false);
+    }
+
+    onScroll = () => {
+      if (
+        (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500) &&
+        this.props.list.length
+      ) {
+        this.props.onPaginatedSearch();
+      }
+    }
+
+    render() {
+      return <Component {...this.props} />;
+    }
+  };
 
 const DifferentList = ({ list }) =>
   <div className="list">
@@ -166,6 +189,11 @@ const withPaginated = (Component) => (props) =>
 
 const ListWithLoadingWithPaginated = compose(
   withPaginated,
+  withLoading,
+)(List);
+
+const ListWithLoadingWithInfinite = compose(
+  withInfiniteScroll,
   withLoading,
 )(List);
 

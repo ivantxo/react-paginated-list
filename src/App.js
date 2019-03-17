@@ -77,14 +77,31 @@ class App extends React.Component {
   }
 }
 
-const List = ({ list, page, isLoading, onPaginatedSearch }) =>
-  <div>
-    <div className="list">
-      {list.map(item => <div className="list-row" key={item.objectID}>
-        <a href={item.url}>* {item.title}</a>
-      </div>)}
-    </div>
-  </div>;
+// Functional stateless component
+// const List = ({ list, page, isLoading, onPaginatedSearch }) =>
+//   <div>
+//     <div className="list">
+//       {list.map(item => <div className="list-row" key={item.objectID}>
+//         <a href={item.url}>* {item.title}</a>
+//       </div>)}
+//     </div>
+//   </div>;
+
+// React ES6 class component
+class List extends React.Component {
+  render() {
+    const { list } = this.props;
+    return (
+      <div className="list">
+        {
+          list.map(item => <div className="list-row" key={item.objectID}>
+            <a href={item.url}>{item.title}</a>
+          </div>)
+        }
+      </div>
+    );
+  }
+}
 
 const DifferentList = ({ list }) =>
   <div className="list">

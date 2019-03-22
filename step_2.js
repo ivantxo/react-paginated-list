@@ -18,7 +18,7 @@ const applySetResult = (result) => (prevState) => ({
 const getHackerNewsUrl = (value, page) =>
   `https://hn.algolia.com/api/v1/search?query=${value}&page=${page}&hitsPerPage=100`;
 
-class App extends React.Component {
+class test2 extends React.Component {
   constructor(props) {
     super(props);
 
@@ -59,8 +59,6 @@ class App extends React.Component {
   render() {
     return (
       <div className="page">
-        <h1>Search Hacker News</h1>
-        
         <div className="interactions">
           <form type="submit" onSubmit={this.onInitialSearch}>
             <input type="text" ref={node => this.input = node} />
@@ -68,8 +66,9 @@ class App extends React.Component {
           </form>
         </div>
 
-        <ListWithLoadingWithInfinite
+        <ListWithLoadingWithPaginated
           list={this.state.hits}
+          isLoading={this.state.isLoading}
           page={this.state.page}
           onPaginatedSearch={this.onPaginatedSearch}
         />
@@ -93,34 +92,25 @@ const withLoading = (Component) => (props) =>
     </div>
   </div>
 
-const withInfiniteScroll = (Component) =>
-  class WithInfiniteScroll extends React.Component {
-    componentDidMount() {
-      window.addEventListener('scroll', this.onScroll, false);
-    }
-
-    componentWillMount() {
-      window.removeEventListener('scroll', this.onScroll, false);
-    }
-
-    onScroll = () => {
-      if (
-        (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500)
-        && this.props.list.length &&
-        !this.props.isLoading
-      ) {
-        this.props.onPaginatedSearch();
+const withPaginated = (Component) => (props) =>
+  <div>
+    <Component {...props} />
+    <div className="interactions">
+      {
+        (props.page !== null && !props.isLoading) &&
+        <button
+          type="button"
+          onClick={props.onPaginatedSearch}
+        >
+          More
+        </button>
       }
-    }
+    </div>
+  </div>
 
-    render() {
-      return <Component { ...this.props } />;
-    }
-  }
-
-const ListWithLoadingWithInfinite = compose(
-  withInfiniteScroll,
+const ListWithLoadingWithPaginated = compose(
+  withPaginated,
   withLoading,
 )(List);
 
-export default App;
+export default test2;

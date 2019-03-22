@@ -1,5 +1,4 @@
 import React from 'react';
-import { compose } from 'recompose';
 
 import './App.css';
 
@@ -18,7 +17,7 @@ const applySetResult = (result) => (prevState) => ({
 const getHackerNewsUrl = (value, page) =>
   `https://hn.algolia.com/api/v1/search?query=${value}&page=${page}&hitsPerPage=100`;
 
-class App extends React.Component {
+class test extends React.Component {
   constructor(props) {
     super(props);
 
@@ -59,8 +58,6 @@ class App extends React.Component {
   render() {
     return (
       <div className="page">
-        <h1>Search Hacker News</h1>
-        
         <div className="interactions">
           <form type="submit" onSubmit={this.onInitialSearch}>
             <input type="text" ref={node => this.input = node} />
@@ -68,8 +65,9 @@ class App extends React.Component {
           </form>
         </div>
 
-        <ListWithLoadingWithInfinite
+        <List
           list={this.state.hits}
+          isLoading={this.state.isLoading}
           page={this.state.page}
           onPaginatedSearch={this.onPaginatedSearch}
         />
@@ -78,49 +76,29 @@ class App extends React.Component {
   }
 }
 
-const List = ({ list }) =>
+const List = ({ list, page, isLoading, onPaginatedSearch }) =>
+<div>
   <div className="list">
     {list.map(item => <div className="list-row" key={item.objectID}>
-      <a href={item.url}>{item.title}></a></div>)}
+      <a href={item.url}>{item.title}</a>
+    </div>)}
   </div>
 
-const withLoading = (Component) => (props) =>
-  <div>
-    <Component {...props} />
-
-    <div className="interactions">
-      {props.isLoading && <span>Loading...</span>}
-    </div>
+  <div className="interactions">
+    {isLoading && <span>Loading...</span>}
   </div>
 
-const withInfiniteScroll = (Component) =>
-  class WithInfiniteScroll extends React.Component {
-    componentDidMount() {
-      window.addEventListener('scroll', this.onScroll, false);
+  <div className="interactions">
+    {
+      (page !== null && !isLoading) &&
+      <button
+        type="button"
+        onClick={onPaginatedSearch}
+      >
+        More
+      </button>
     }
+  </div>
+</div>
 
-    componentWillMount() {
-      window.removeEventListener('scroll', this.onScroll, false);
-    }
-
-    onScroll = () => {
-      if (
-        (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500)
-        && this.props.list.length &&
-        !this.props.isLoading
-      ) {
-        this.props.onPaginatedSearch();
-      }
-    }
-
-    render() {
-      return <Component { ...this.props } />;
-    }
-  }
-
-const ListWithLoadingWithInfinite = compose(
-  withInfiniteScroll,
-  withLoading,
-)(List);
-
-export default App;
+export default test;

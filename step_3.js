@@ -18,7 +18,7 @@ const applySetResult = (result) => (prevState) => ({
 const getHackerNewsUrl = (value, page) =>
   `https://hn.algolia.com/api/v1/search?query=${value}&page=${page}&hitsPerPage=100`;
 
-class App extends React.Component {
+class test2 extends React.Component {
   constructor(props) {
     super(props);
 
@@ -123,4 +123,4 @@ const ListWithLoadingWithInfinite = compose(
   withLoading,
 )(List);
 
-export default App;
+export default test2;

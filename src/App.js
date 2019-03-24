@@ -98,22 +98,22 @@ const List = ({ list }) =>
       <a href={item.url}>{item.title}></a></div>)}
   </div>
 
-const withLoading = (Component) => (props) =>
+const withLoading = (conditionFn) => (Component) => (props) =>
   <div>
     <Component {...props} />
 
     <div className="interactions">
-      {props.isLoading && <span>Loading...</span>}
+      {conditionFn(props) && <span>Loading...</span>}
     </div>
   </div>
 
-const withPaginated = (Component) => (props) =>
+const withPaginated = (conditionFn) => (Component) => (props) =>
   <div>
     <Component {...props} />
 
     <div className="interactions">
       {
-        (props.page !== null && !props.isLoading && props.isError) &&
+        conditionFn(props) &&
         <div>
           <div>
             Something went wrong...
@@ -129,7 +129,7 @@ const withPaginated = (Component) => (props) =>
     </div>
   </div>
 
-const withInfiniteScroll = (Component) =>
+const withInfiniteScroll = (conditionFn) => (Component) =>
   class WithInfiniteScroll extends React.Component {
     componentDidMount() {
       window.addEventListener('scroll', this.onScroll, false);
@@ -140,14 +140,7 @@ const withInfiniteScroll = (Component) =>
     }
 
     onScroll = () => {
-      if (
-        (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500)
-        && this.props.list.length &&
-        !this.props.isLoading &&
-        !this.props.isError
-      ) {
-        this.props.onPaginatedSearch();
-      }
+      conditionFn(this.props) && this.props.onPaginatedSearch();
     }
 
     render() {
@@ -155,10 +148,22 @@ const withInfiniteScroll = (Component) =>
     }
   }
 
+const paginatedCondition = props =>
+  props.page !== null && !props.isLoading && props.isError;
+
+const infiniteScrollingCondition = props =>
+  (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 500)
+  && props.list.length
+  && !props.isLoading
+  && !props.isError;
+
+const loadingCondition = props =>
+  props.isLoading;
+
 const AdvancedList = compose(
-  withPaginated,
-  withInfiniteScroll,
-  withLoading,
+  withPaginated(paginatedCondition),
+  withInfiniteScroll(infiniteScrollingCondition),
+  withLoading(loadingCondition),
 )(List);
 
 export default App;
